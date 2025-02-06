@@ -2,24 +2,29 @@ package com.korit.springboot_study.controller;
 
 import com.korit.springboot_study.dto.request.study.ReqAddInstructorDto;
 import com.korit.springboot_study.dto.request.study.ReqAddMajorDto;
-import com.korit.springboot_study.dto.response.common.ResponseDto;
+import com.korit.springboot_study.dto.request.study.ReqUpdateMajorDto;
 import com.korit.springboot_study.dto.response.common.SuccessResponseDto;
 import com.korit.springboot_study.entity.study.Instructor;
 import com.korit.springboot_study.entity.study.Major;
-import com.korit.springboot_study.mapper.StudentStudyMapper;
 import com.korit.springboot_study.service.StudentStudyService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @RestController
+@Validated // 컨트롤러의 매개변수에서 바로 유효성 검사할 때 @Valid와는 상관없음 / @Min(value = 1, message = "학과 ID는 1이상의 정수여야 합니다.")이런거 쓸려고 함
 public class StudentStudyController {
 
     @Autowired
@@ -38,19 +43,51 @@ public class StudentStudyController {
     }
 
     @PostMapping("/api/study/major")
-    public ResponseEntity<SuccessResponseDto<?>> addMajor(@RequestBody ReqAddMajorDto reqAddMajorDto) {
+    public ResponseEntity<SuccessResponseDto<Major>> addMajor(@Valid @RequestBody ReqAddMajorDto reqAddMajorDto) throws MethodArgumentNotValidException {
         System.out.println(reqAddMajorDto);
         return ResponseEntity.ok().body(studentStudyService.addMajor(reqAddMajorDto));
+
+//        boolean isNull = reqAddMajorDto == null;
+//        boolean isBlank = reqAddMajorDto.getMajorName().isBlank();
+//        boolean isKor = !Pattern.matches("^[ㄱ-ㅎ|가-힣]*$", reqAddMajorDto.getMajorName());
+//
+//        if(isNull || isBlank || isKor) {
+//            BindingResult bindingResult = new BeanPropertyBindingResult(null, "major");
+//            throw new MethodArgumentNotValidException(null, bindingResult);
+//        }
+
     }
 
     @PostMapping("/api/study/instructor")
-    public ResponseEntity<SuccessResponseDto<?>> addInstructor(@RequestBody ReqAddInstructorDto reqAddInstructorDto) {
+    public ResponseEntity<SuccessResponseDto<Instructor>> addInstructor(@RequestBody ReqAddInstructorDto reqAddInstructorDto) {
         System.out.println(reqAddInstructorDto);
         return ResponseEntity.ok().body(studentStudyService.addInstructor(reqAddInstructorDto));
+    }
+
+    @PutMapping("/api/study/major/{majorId}") // 1. put요청이라서 {majorId}JSON형식으로 주면
+    public ResponseEntity<SuccessResponseDto<?>> updateMajor(
+            @ApiParam(value = "학과 ID", example = "1", required = true)
+            @PathVariable @Min(value = 1, message = "학과 ID는 1이상의 정수여야 합니다.") int majorId,
+            @Valid @RequestBody ReqUpdateMajorDto reqUpdateMajorDto) throws MethodArgumentNotValidException, NotFoundException {// 2. DTO형식으로 받기 위해 @RequestBody를 씀
+
+        return ResponseEntity.ok().body(studentStudyService.modifyMajor(majorId, reqUpdateMajorDto));
     }
 }
 
 /*
+
+흐름 순서: 서비스 -> Repository -> Mapper -> MySQL
+부품부터 만들기: 컨트롤러, DB_tb -> Mapper -> Repository -> 서비스
+
+@ApiOperation:
+    value: API 메서드의 간단한 설명. 예를 들어, "학과 전체 조회"처럼 메서드가 하는 일을 간략히 설명합니다.
+    notes: API 메서드에 대한 상세한 설명. 예를 들어, 메서드가 어떤 데이터를 반환하는지, 또는 특정 동작을 수행하는지에 대한 추가적인 설명을 제공할 수 있습니다.
+
+@Valid: ReqUpdateMajorDto와 같은 DTO 객체에서 유효성 검사를 실행할 때 사용합니다.
+@RequestBody: 클라이언트가 { "majorName": "정보 보안" } 같은 JSON형식으로 주면 spring에서 DTO형식으로 받기 위해서 씀
+@Min: 최소값이 1이며 1이 아니면 유효성 검사 실패.
+@PathVariable: {majorId}와 같은 동적변수를 바인딩하고 메서드에서 사용하기 위해서 씀
+
 학생 학습(StudentStudy) 관련 기능을 제공하는 API
 
 StudentStudyController (컨트롤러)

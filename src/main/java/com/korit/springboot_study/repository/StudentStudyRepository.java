@@ -4,6 +4,7 @@ import com.korit.springboot_study.entity.study.Instructor;
 import com.korit.springboot_study.entity.study.Major;
 import com.korit.springboot_study.exception.CustomDuplicateKeyException;
 import com.korit.springboot_study.mapper.StudentStudyMapper;
+import org.apache.ibatis.javassist.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
@@ -61,6 +62,20 @@ public class StudentStudyRepository {
             );
         }
         return Optional.ofNullable(new Instructor(instructor.getInstructorId(), instructor.getInstructorName()));
+    }
+
+    public Optional<Major> updateMajor(Major major) throws NotFoundException, DuplicateKeyException {
+        try {
+            if(studentStudyMapper.updateMajorName(major) == 0) {
+                return Optional.empty();
+            }
+        } catch (DuplicateKeyException e) {
+            throw new CustomDuplicateKeyException(
+                e.getMessage(),
+                Map.of("majorName", "이미 존재하는 학과명입니다.")
+            );
+        }
+        return Optional.ofNullable(major);
     }
 }
 

@@ -24,6 +24,15 @@
         values (default, #{instructorName})
     </insert>
 
+    <update id="updateMajorName">
+        update
+            major_tb
+        set
+            major_name = #{majorName}
+        where
+            major_id = #{majorId}
+    </update>
+
     <select id="selectMajorsAll" resultMap="majorResultMap">
         select
             major_id,

@@ -2,6 +2,7 @@ package com.korit.springboot_study.service;
 
 import com.korit.springboot_study.dto.request.study.ReqAddInstructorDto;
 import com.korit.springboot_study.dto.request.study.ReqAddMajorDto;
+import com.korit.springboot_study.dto.request.study.ReqUpdateMajorDto;
 import com.korit.springboot_study.dto.response.common.NotFoundResponseDto;
 import com.korit.springboot_study.dto.response.common.ResponseDto;
 import com.korit.springboot_study.dto.response.common.SuccessResponseDto;
@@ -53,6 +54,14 @@ public class StudentStudyService {
                         .saveInstructor(new Instructor(0, reqAddInstructorDto.getInstructorName()))
                         .get()
         );
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public SuccessResponseDto<Major> modifyMajor(int majorId, ReqUpdateMajorDto reqUpdateMajorDto) throws NotFoundException, DuplicateKeyException {
+       Major modifyMajor = studentStudyRepository
+               .updateMajor(new Major(majorId, reqUpdateMajorDto.getMajorName()))
+               .orElseThrow(() -> new NotFoundException("해당 학과 ID는 존재하지 않습니다."));
+       return new SuccessResponseDto<>(modifyMajor);
     }
 }
 
