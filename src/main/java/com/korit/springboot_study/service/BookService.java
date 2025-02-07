@@ -1,6 +1,7 @@
 package com.korit.springboot_study.service;
 
 import com.korit.springboot_study.dto.request.ReqAddBookDto;
+import com.korit.springboot_study.dto.request.ReqSearchBookDto;
 import com.korit.springboot_study.dto.response.common.SuccessResponseDto;
 import com.korit.springboot_study.entity.Book;
 import com.korit.springboot_study.repository.BookRepository;
@@ -19,12 +20,14 @@ public class BookService {
     @Autowired
     private BookRepository bookRepository;
 
-    public SuccessResponseDto<List<Book>> getBooksAll() throws NotFoundException {
-        return new SuccessResponseDto<>(
-                bookRepository
-                        .findBookAll()
-                        .orElseThrow(() -> new NotFoundException("책 데이터가 존재하지 않습니다.")));
-
+    public Book addBook(ReqAddBookDto reqAddBookDto) {
+        return bookRepository
+                .save(reqAddBookDto.toBook())
+                .get();
     }
 
+    public List<Book> getAllBooks(ReqSearchBookDto reqSearchBookDto) throws Exception {
+        return bookRepository.findBookAll(reqSearchBookDto.getKeyword())
+                .orElseThrow(() -> new NotFoundException("조회된 도서명이 없습니다."));
+    }
 }

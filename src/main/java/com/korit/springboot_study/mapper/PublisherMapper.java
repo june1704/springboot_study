@@ -1,4 +1,14 @@
 package com.korit.springboot_study.mapper;
 
-public class PublisherMapper {
+import com.korit.springboot_study.entity.Book;
+import com.korit.springboot_study.entity.Publisher;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+@Mapper
+public interface PublisherMapper {
+    int insert(Publisher book);
+    List<Publisher> selectPublishersAll(@Param(value = "publisherName") String publisherName);
 }

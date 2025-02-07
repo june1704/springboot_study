@@ -77,7 +77,7 @@ public class StudentStudyController {
 /*
 
 흐름 순서: 서비스 -> Repository -> Mapper -> MySQL
-부품부터 만들기: 컨트롤러, DB_tb -> Mapper -> Repository -> 서비스
+부품부터 만들기: 컨트롤러, DB_tb -> Mapper -> Repository -> Dto -> 서비스
 
 @ApiOperation:
     value: API 메서드의 간단한 설명. 예를 들어, "학과 전체 조회"처럼 메서드가 하는 일을 간략히 설명합니다.

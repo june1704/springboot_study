@@ -1,4 +1,13 @@
 package com.korit.springboot_study.mapper;
 
-public class AuthorMapper {
+import com.korit.springboot_study.entity.Author;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+@Mapper
+public interface AuthorMapper {
+    int insert(Author author);
+    List<Author> selectAuthorsAll(@Param(value = "authorName")String authorName);
 }

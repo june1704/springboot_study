@@ -8,6 +8,6 @@ import java.util.List;
 
 @Mapper
 public interface BookMapper {
-
-    List<Book> selectBooksAll(@Param("bookName")String bookName);
+    int insert(Book book);
+    List<Book> selectBooksAll(@Param(value = "bookName")String bookName);
 }
