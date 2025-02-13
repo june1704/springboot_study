@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -16,8 +17,8 @@
     </resultMap>
 
     <resultMap id="userResultMap" type="com.korit.springboot_study.entity.User">
-        <id property="userId" column="ut_user_id" />
-        <result property="username" column="username" />
+        <id property="userId" column="ut_user_id"/>
+        <result property="username" column="username"/>
     </resultMap>
 
     <insert id="insert" keyProperty="postId" useGeneratedKeys="true">
@@ -27,62 +28,67 @@
 
     <select id="selectById" resultMap="postResultMap">
         with cte_post_like_count_tb as (
-            select
-                post_id,
-                count(post_id) as like_count
-            from
-                post_like_tb
-            group by
-                post_id
+        select
+        post_id,
+        count(post_id) as like_count
+        from
+        post_like_tb
+        group by
+        post_id
         )
         select
-            pt.post_id,
+        pt.post_id,
 
-            pt.user_id as pt_user_id,
-            ut.user_id as ut_user_id,
-            ut.username,
+        pt.user_id as pt_user_id,
+        ut.user_id as ut_user_id,
+        ut.username,
 
-            pt.title,
-            pt.content,
-            pt.created_at,
-            pt.updated_at,
+        pt.title,
+        pt.content,
+        pt.created_at,
+        pt.updated_at,
 
-            ifnull(cplct.like_count, 0) as like_count
+        ifnull(cplct.like_count, 0) as like_count
         from
-            post_tb pt
-            inner join user_tb ut on(ut.user_id = pt.user_id)
-            left outer join cte_post_like_count_tb cplct on(cplct.post_id = pt.post_id)
+        post_tb pt
+        inner join user_tb ut on(ut.user_id = pt.user_id)
+        left outer join cte_post_like_count_tb cplct on(cplct.post_id = pt.post_id)
         where
-            post_id = #{postId}
+        pt.post_id = #{postId}
     </select>
+
     <select id="selectAllBykeywordContaining" resultMap="postResultMap">
         with cte_post_like_count_tb as (
-            select
-                post_id,
-                count(post_id) as like_count
-            from
-                post_like_tb
-            group by
-                post_id
+        select
+        post_id,
+        count(post_id) as like_count
+        from
+        post_like_tb
+        group by
+        post_id
         )
         select
-            post_id,
-            user_id,
-            title,
-            content,
-            created_at,
-            updated_at,
+        pt.post_id,
 
-            ifnull(cplct.like_count, 0) as like_count
+        pt.user_id as pt_user_id,
+        ut.user_id as ut_user_id,
+        ut.username,
+
+        pt.title,
+        pt.content,
+        pt.created_at,
+        pt.updated_at,
+
+        ifnull(cplct.like_count, 0) as like_count
         from
-            post_tb pt
-            inner join user_tb ut on(ut.user_id = pt.user_id)
-            left outer join cte_post_like_count_tb cplct on(cplct.post_id = pt.post_id)
+        post_tb pt
+        inner join user_tb ut on(ut.user_id = pt.user_id)
+        left outer join cte_post_like_count_tb cplct on(cplct.post_id = pt.post_id)
         where
-            title like concat("%", #{keyword}, "%")
-            or content like concat("%", #{keyword}, "%")
+        title like concat("%", #{keyword}, "%")
+        or content like concat("%", #{keyword}, "%")
         order by
-            post_id desc
+        post_id desc
         limit #{startIndex}, #{limitCount}
     </select>
 </mapper>

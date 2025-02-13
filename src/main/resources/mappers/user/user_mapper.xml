@@ -11,7 +11,11 @@
         <result property="password" column="password" />
         <result property="name" column="name" />
         <result property="email" column="email" />
-        <collection property="userroles" resultMap="userRoleResultMap" />
+        <result property="isAccountNonExpired" column="account_expired" />
+        <result property="isAccountNonLocked" column="account_locked" />
+        <result property="isCredentialsNonExpired" column="credentials_expired" />
+        <result property="isEnabled" column="account_enabled" />
+        <collection property="userRoles" resultMap="userRoleResultMap" />
     </resultMap>
 
     <resultMap id="userRoleResultMap" type="com.korit.springboot_study.entity.UserRole">
@@ -28,7 +32,7 @@
 
     <insert id="insert" keyProperty="userId" useGeneratedKeys="true">
         insert into user_tb
-        values(default, #{username}, #{password}, #{name}, #{email})
+        values(default, #{username}, #{password}, #{name}, #{email}, 1, 1, 1, 1)
     </insert>
 
     <update id="updateUserById">
@@ -48,15 +52,28 @@
 
     <select id="selectByUsername" resultMap="userResultMap">
         select
-            user_id,
-            username,
-            password,
-            name,
-            email
+            ut.user_id,
+            ut.username,
+            ut.password,
+            ut.name,
+            ut.email,
+            ut.account_expired,
+            ut.account_locked,
+            ut.credentials_expired,
+            ut.account_enabled,
+
+            urt.user_role_id,
+            urt.user_id,
+            urt.role_id,
+
+            rt.role_id,
+            rt.role_name
         from
-            user_tb
+            user_tb ut
+            left outer join user_role_tb urt on(urt.user_id = ut.user_id)
+            left outer join role_tb rt on(rt.role_id = urt.role_id)
         where
-            username = #{username}
+            ut.username = #{username}
     </select>
     <select id="selectById" resultMap="userResultMap">
         select
@@ -65,6 +82,10 @@
             ut.password,
             ut.name,
             ut.email,
+            ut.account_expired,
+            ut.account_locked,
+            ut.credentials_expired,
+            ut.account_enabled,
 
             urt.user_role_id,
             urt.user_id,
@@ -86,6 +107,10 @@
         ut.password,
         ut.name,
         ut.email,
+        ut.account_expired,
+        ut.account_locked,
+        ut.credentials_expired,
+        ut.account_enabled,
 
         urt.user_role_id,
         urt.user_id,
