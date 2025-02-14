@@ -47,6 +47,7 @@ public class JwtProvider {
         Claims claims = null;
         try {
             JwtParser parser = Jwts.parserBuilder()
+                    .setSigningKey(key)
                     .build();
             claims = parser.parseClaimsJws(removeBearer(token)).getBody();
         } catch (Exception e) {

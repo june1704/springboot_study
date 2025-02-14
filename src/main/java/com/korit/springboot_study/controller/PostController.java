@@ -23,7 +23,7 @@ public class PostController {
 
     //create
     @PostMapping("/api/post")
-    public ResponseEntity<SuccessResponseDto<Optional<Post>>> createPost(@RequestBody ReqCreatePostDto reqCreatePostDto) {
+    public ResponseEntity<SuccessResponseDto<Post>> createPost(@RequestBody ReqCreatePostDto reqCreatePostDto) {
         return ResponseEntity
                 .created(URI.create(""))
                 .body(new SuccessResponseDto<>(postService.createPost(reqCreatePostDto)));

@@ -3,9 +3,12 @@ package com.korit.springboot_study.config;
 import com.korit.springboot_study.security.exception.CustomAuthenticationEntryPoint;
 import com.korit.springboot_study.security.filter.CustomAuthenticationFilter;
 import com.korit.springboot_study.security.filter.JwtAuthenticationFilter;
+import com.korit.springboot_study.security.oauth2.OAuth2Service;
+import com.korit.springboot_study.security.oauth2.OAuth2SuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -16,6 +19,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity // 스프링 시큐리티 설정을 활성화하는 어노테이션
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private OAuth2SuccessHandler oAuth2SuccessHandler;
+
+    @Autowired
+    private OAuth2Service oAuth2Service;
 
     @Autowired
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint; // 인증 실패 시 처리하는 클래스
@@ -51,6 +60,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.exceptionHandling()
                 .authenticationEntryPoint(customAuthenticationEntryPoint);
 
+        http.oauth2Login()
+                .successHandler(oAuth2SuccessHandler)
+                        .userInfoEndpoint()
+                                .userService(oAuth2Service);
+
+
         // 요청에 대한 권한 설정
         http.authorizeRequests()
                 .antMatchers(
@@ -60,15 +75,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-resources/**" // Swagger 리소스 접근 허용
                 )
                 .permitAll() // 위 경로들은 모두 인증 없이 접근 가능
-
-                .antMatchers("/api/auth/**") // 인증 관련 API도 인증 없이 접근 허용
+                .antMatchers(HttpMethod.GET) // 인증 관련 API도 인증 없이 접근 허용
                 .permitAll()
-
                 .anyRequest() // 나머지 모든 요청
-                .authenticated() // 인증된 사용자만 접근 가능
-                .and()
-                .exceptionHandling() // 인증 실패 시 처리할 예외 핸들러 설정
-                .authenticationEntryPoint(customAuthenticationEntryPoint);
+                .authenticated(); // 인증된 사용자만 접근 가능
+//                .and()
+//                .exceptionHandling() // 인증 실패 시 처리할 예외 핸들러 설정
+//                .authenticationEntryPoint(customAuthenticationEntryPoint);
     }
 }
 

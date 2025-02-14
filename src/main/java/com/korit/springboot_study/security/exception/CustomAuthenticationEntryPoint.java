@@ -18,7 +18,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Autowired
     private ObjectMapper objectMapper; // JSON 형식으로 응답을 작성하기 위한 ObjectMapper 주입
 
-    /**
+    /*
      * 인증 실패 시 호출되는 메서드
      * @param request 인증이 실패한 요청 객체
      * @param response 클라이언트에 반환할 응답 객체
