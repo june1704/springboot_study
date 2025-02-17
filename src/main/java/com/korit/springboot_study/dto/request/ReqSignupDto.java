@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 @Data
@@ -23,6 +24,7 @@ public class ReqSignupDto {
     private String name;
 
     @ApiModelProperty(value = "이메일 주소", example = "user@mail.com", required = true)
+    @NotBlank(message = "이메일을 입력하세요")
     @Email(message = "이메일 형식으로 입력해야합니다.")
     private String email;
 

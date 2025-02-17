@@ -40,6 +40,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.cors();
+
         // CSRF 비활성화: REST API에서는 CSRF 보호가 필요 없으므로 비활성화
         http.csrf().disable();
 
@@ -72,10 +74,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/swagger-ui/**", // Swagger UI 접근 허용
                         "/v2/api-docs/**", // Swagger API Docs 접근 허용
                         "/v3/api-docs/**", // Swagger API Docs 접근 허용
-                        "/swagger-resources/**" // Swagger 리소스 접근 허용
+                        "/swagger-resources/**", // Swagger 리소스 접근 허용
+                        "/server/hc"
                 )
                 .permitAll() // 위 경로들은 모두 인증 없이 접근 가능
-                .antMatchers(HttpMethod.GET) // 인증 관련 API도 인증 없이 접근 허용
+                .antMatchers("/api/auth/**") // 인증 관련 API도 인증 없이 접근 허용
                 .permitAll()
                 .anyRequest() // 나머지 모든 요청
                 .authenticated(); // 인증된 사용자만 접근 가능
